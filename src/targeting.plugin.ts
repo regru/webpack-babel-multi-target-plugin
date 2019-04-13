@@ -127,6 +127,10 @@ export class TargetingPlugin implements Plugin {
         resolveContext.chunkName = babelTarget.getTargetedAssetName(resolveContext.chunkName)
       }
 
+      // this needs to happen in addition to request targeting in targetLazyModules, otherwise it breaks Angular routing
+      // and makes all sorts of weird chunks
+      resolveContext.resource = babelTarget.getTargetedRequest(resolveContext.resource)
+
       // piggy-back on the existing resolveDependencies function to target the dependencies.
       // for angular lazy routes, this wraps the resolveDependencies function defined in the compiler plugin
       const ogResolveDependencies = resolveContext.resolveDependencies
@@ -179,7 +183,7 @@ export class TargetingPlugin implements Plugin {
     module.addBlock = (block: any) => {
       // if a dynamic import has specified the [resource] tag in its chunk name, overwrite the computed
       // name with the request path, minus the extension
-      if (module.options.mode === 'lazy' && module.options.chunkName.includes('[resource]')) {
+      if (module.options.mode === 'lazy' && module.options.chunkName && module.options.chunkName.includes('[resource]')) {
         const resource = block.request
           .replace(/\.\w+$/, '') // remove the extension
           .replace(/\W+/g, '-') // replace any non-alphanumeric characters with -
@@ -265,10 +269,9 @@ export class TargetingPlugin implements Plugin {
 
   public replaceLoaders(resolveContext: any, loaders: BabelMultiTargetLoader[]): void {
 
-    const babelTarget: BabelTarget = BabelTarget.getTargetFromTag(resolveContext.rawRequest, this.targets) ||
-      (resolveContext.resourceResolveData &&
-      this.isTranspiledRequest(resolveContext) &&
-      this.getTargetFromContext(resolveContext))
+    const babelTarget: BabelTarget = this.isTranspiledRequest(resolveContext) &&
+      (BabelTarget.getTargetFromTag(resolveContext.rawRequest, this.targets) ||
+      (resolveContext.resourceResolveData && this.getTargetFromContext(resolveContext)))
 
     loaders.forEach((loader: BabelMultiTargetLoader) => {
       const index = resolveContext.loaders.indexOf(loader)
