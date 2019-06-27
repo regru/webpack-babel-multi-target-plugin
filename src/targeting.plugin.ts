@@ -382,7 +382,12 @@ export class TargetingPlugin implements Plugin {
         return false
       }
       if (typeof (pkg.browser === 'object') &&
-        Object.values(pkg.browser).find((entry: string) => resolveContext.resource === path.resolve(pkgRoot, entry))
+        Object.values(pkg.browser).find((entry) => {
+          if (typeof entry !== 'string') {
+              return false;
+          }
+          return resolveContext.resource === path.resolve(pkgRoot, entry);
+        })
       ) {
         return false
       }
