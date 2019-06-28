@@ -1,5 +1,5 @@
 {
-  "name": "webpack-babel-multi-target-plugin",
+  "name": "@regru/webpack-babel-multi-target-plugin",
   "description": "A Webpack plugin that works with Babel to allow deployment of ES2015 builds targeted to modern browsers, with an ES5 fallback for legacy browsers.",
   "keywords": [
     "webpack",
@@ -14,7 +14,7 @@
     "es6",
     "es7"
   ],
-  "version": "2.2.0",
+  "version": "2.3.0",
   "author": {
     "name": "Daniel Schaffer",
     "email": "dan@dandoes.net",
