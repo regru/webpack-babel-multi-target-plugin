@@ -120,7 +120,7 @@ export class BabelTarget implements BabelTargetInfo {
     // need to make separate "requests" for the dev server client, but using the query breaks it, so use a hash instead
     const joiner = request.startsWith(DEV_SERVER_CLIENT) ?
       '#' :
-      request.includes('?') ? '&' : '?'
+      request.includes('?') && !request.includes('imports-loader') && !request.includes('exports-loader') ? '&' : '?'
     return request + joiner + tag
   }
 
